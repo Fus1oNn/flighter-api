@@ -1,6 +1,6 @@
 RSpec.describe WorldCup::Event do
   let(:event) do
-    WorldCup::Match.new('id' => 276,
+    described_class.new('id' => 276,
                         'type_of_event' => 'goal',
                         'player' => 'Luis SUAREZ',
                         'time' => "23'")
