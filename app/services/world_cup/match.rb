@@ -59,7 +59,7 @@ module WorldCup
 
     def as_json(_opts)
       { away_team: away_team_name,
-        goals: goals.present? ? '--' : goals.length,
+        goals: goals.present? ? goals.length : '--',
         home_team: home_team_name,
         score: score,
         status: status,
