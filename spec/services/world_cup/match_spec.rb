@@ -43,8 +43,8 @@ RSpec.describe WorldCup::Match do
   end
 
   it 'gets home_team_goals' do
-    expect(match.home_team_goals)
-      .to eq(1)
+    expect(match.home_team_goals.map(&:to_s))
+      .to eq(["#1: own-goal@23' - Trippier"])
   end
 
   it 'gets away_team_name' do
@@ -56,7 +56,8 @@ RSpec.describe WorldCup::Match do
   end
 
   it 'gets away_team_goals' do
-    expect(match.away_team_goals).to eq(2)
+    expect(match.away_team_goals.map(&:to_s))
+      .to eq(["#3: goal@68' - Ivan Perisic", "#4: goal@89' - Luka Modric"])
   end
 
   it 'gets all events' do
@@ -66,7 +67,9 @@ RSpec.describe WorldCup::Match do
   end
 
   it 'gets all goals' do
-    expect(match.goals).to eq(3)
+    expect(match.goals.map(&:to_s))
+      .to eq(["#1: own-goal@23' - Trippier",
+              "#3: goal@68' - Ivan Perisic", "#4: goal@89' - Luka Modric"])
   end
 
   it 'returns Events objects on #events' do
