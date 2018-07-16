@@ -31,7 +31,7 @@ RSpec.describe WorldCup::Match do
   end
 
   it 'initializes datetime' do
-    expect(match.starts_at.to_s).to eq('2018-06-20 15:00:00 UTC')
+    expect(match.starts_at).to eq(Time.parse('2018-06-20T17:00:00').utc)
   end
 
   it 'gets home_team_name' do

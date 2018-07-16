@@ -1,6 +1,4 @@
 module WorldCup
-  require 'time'
-
   class Match
     attr_accessor :venue, :status, :starts_at
     attr_reader :home_team, :away_team
@@ -51,17 +49,20 @@ module WorldCup
     end
 
     def score
-      "#{home_team_goals.length} : #{away_team_goals.length}"
-    end
-
-    def check_date(date)
-      starts_at.yday == date.yday && starts_at.year == date.year
+      if status == 'future'
+        '--'
+      else
+        "#{home_team_goals.length} : #{away_team_goals.length}"
+      end
     end
 
     def as_json(_opts)
-      # super(only: [:venue, :status],
-      #      methods: [:home_team_name, :away_team_name, :goals, :score])
-      super()
+      { away_team: away_team_name,
+        goals: goals.present? ? goals.length : '--',
+        home_team: home_team_name,
+        score: score,
+        status: status,
+        venue: venue }
     end
 
     def team_events(match, team)
