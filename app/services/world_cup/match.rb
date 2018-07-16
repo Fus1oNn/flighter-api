@@ -17,7 +17,7 @@ module WorldCup
     end
 
     def home_team_goals
-      home_team_events.select(&:any_goal?)
+      home_team_events.select(&:any_goal?).length
     end
 
     def home_team_name
@@ -29,7 +29,7 @@ module WorldCup
     end
 
     def away_team_goals
-      away_team_events.select(&:any_goal?)
+      away_team_events.select(&:any_goal?).length
     end
 
     def away_team_name
@@ -45,24 +45,21 @@ module WorldCup
     end
 
     def goals
-      if status == 'future'
-        '--'
-      else
-        home_team_goals + away_team_goals
-      end
+      home_team_events
+        .select(&:any_goal?) + away_team_events.select(&:any_goal?)
     end
 
     def score
       if status == 'future'
         '--'
       else
-        "#{home_team_goals.length} : #{away_team_goals.length}"
+        "#{home_team_goals} : #{away_team_goals}"
       end
     end
 
     def as_json(_opts)
       { away_team: away_team_name,
-        goals: goals == '--' ? '--' : goals.length,
+        goals: goals.present? ? '--' : goals.length,
         home_team: home_team_name,
         score: score,
         status: status,
