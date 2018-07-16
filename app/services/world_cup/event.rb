@@ -13,8 +13,8 @@ module WorldCup
       "##{id}: #{type}@#{time} - #{player}"
     end
 
-    def goal?
-      type == 'goal'
+    def any_goal?
+      type.include? 'goal'
     end
   end
 end
