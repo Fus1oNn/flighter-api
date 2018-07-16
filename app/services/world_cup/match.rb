@@ -56,7 +56,7 @@ module WorldCup
       if status == 'future'
         '--'
       else
-        "#{home_team_goals.length} : #{away_team_goals.length}"
+        "#{home_team_goals} : #{away_team_goals}"
       end
     end
 
