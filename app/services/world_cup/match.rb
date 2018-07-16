@@ -50,6 +50,20 @@ module WorldCup
       home_team_goals + away_team_goals
     end
 
+    def score
+      "#{home_team_goals.length} : #{away_team_goals.length}"
+    end
+
+    def check_date(date)
+      starts_at.yday == date.yday && starts_at.year == date.year
+    end
+
+    def as_json(_opts)
+      # super(only: [:venue, :status],
+      #      methods: [:home_team_name, :away_team_name, :goals, :score])
+      super()
+    end
+
     def team_events(match, team)
       match["#{team}_team_events"]
         .map do |event|
