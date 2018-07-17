@@ -71,7 +71,6 @@ RSpec.describe WorldCup::Match do
   end
 
   it 'returns Events objects on #events' do
-    expect(match.events.map(&:class)).to eq([WorldCup::Event, WorldCup::Event,
-                                             WorldCup::Event])
+    expect(match.events).to all be_a(WorldCup::Event)
   end
 end

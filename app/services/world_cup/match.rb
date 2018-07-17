@@ -45,16 +45,12 @@ module WorldCup
     end
 
     def goals
-      home_team_events
-        .select(&:any_goal?) + away_team_events.select(&:any_goal?)
+      (home_team_events + away_team_events).select(&:any_goal?)
     end
 
     def score
-      if status == 'future'
-        '--'
-      else
-        "#{home_team_goals} : #{away_team_goals}"
-      end
+      return '--' if status == 'future'
+      "#{home_team_goals} : #{away_team_goals}"
     end
 
     def as_json(_opts)
