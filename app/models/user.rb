@@ -3,5 +3,5 @@ class User < ApplicationRecord
   validates :email, format: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
   validates :first_name, presence: true, length: { minimum: 2 }
 
-  has_many :bookings, dependent: destroy
+  has_many :bookings, dependent: :destroy
 end

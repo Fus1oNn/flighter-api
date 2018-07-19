@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :booking do
+    big_seat_price
+    enough_seats
     user
     flight
   end
@@ -18,13 +20,5 @@ FactoryBot.define do
 
   trait :no_seats do
     no_of_seats 0
-  end
-
-  trait :past_flight do
-    flys_at { 1.day.ago }
-  end
-
-  trait :future_flight do
-    flys_at { 1.day.from_now }
   end
 end
