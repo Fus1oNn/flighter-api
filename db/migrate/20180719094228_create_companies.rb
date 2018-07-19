@@ -5,6 +5,6 @@ class CreateCompanies < ActiveRecord::Migration[5.2]
 
       t.timestamps null: false
     end
-  add_index :companies, :name, unique: true
+    add_index :companies, :name, unique: true
   end
 end

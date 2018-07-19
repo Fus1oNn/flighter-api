@@ -25,4 +25,4 @@ Things you may want to cover:
 
 ** Heroku URL:
 
-https://protected-thicket-24813.herokuapp.com/
+https://protected-dusk-93445.herokuapp.com/
