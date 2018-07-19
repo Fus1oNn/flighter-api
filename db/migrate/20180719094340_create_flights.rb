@@ -8,6 +8,8 @@ class CreateFlights < ActiveRecord::Migration[5.2]
       t.datetime :lands_at
 
       t.belongs_to :company, index: true, foreign_key: true
+
+      t.timestamps null: false
     end
   end
 end
