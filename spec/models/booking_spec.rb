@@ -1,7 +1,5 @@
 RSpec.describe Booking do
-  subject do
-    FactoryBot.create(:booking)
-  end
+  subject { FactoryBot.create(:booking) }
 
   it { is_expected.to validate_presence_of(:seat_price) }
   it { is_expected.to validate_numericality_of(:seat_price).is_greater_than(0) }
