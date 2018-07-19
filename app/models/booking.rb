@@ -8,7 +8,7 @@ class Booking < ApplicationRecord
 
   def flight_in_the_future
     flight = Flight.find_by(id: flight_id)
-    return if Time.current < flight.flys_at
+    return if flight && (Time.current < flight.flys_at)
 
     errors.add(:flys_at, "can't be in the past")
   end

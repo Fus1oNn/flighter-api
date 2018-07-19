@@ -1,7 +1,5 @@
 RSpec.describe Flight do
-  subject do
-    FactoryBot.create(:flight)
-  end
+  subject { FactoryBot.create(:flight) }
 
   it { is_expected.to validate_presence_of(:name) }
   it do
