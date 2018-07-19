@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 2018_07_19_094924) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_companies_on_name", unique: true
   end
 
   create_table "flights", force: :cascade do |t|
@@ -39,6 +40,8 @@ ActiveRecord::Schema.define(version: 2018_07_19_094924) do
     t.datetime "flys_at"
     t.datetime "lands_at"
     t.bigint "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_flights_on_company_id"
   end
 
@@ -48,6 +51,7 @@ ActiveRecord::Schema.define(version: 2018_07_19_094924) do
     t.string "email", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "bookings", "flights"
