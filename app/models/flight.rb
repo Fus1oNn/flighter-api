@@ -11,6 +11,7 @@ class Flight < ApplicationRecord
   has_many :bookings, dependent: :destroy
 
   def flys_at_before_lands_at
-    errors.add(:flys_at, "can't be after lands_at") unless :flys_at < :lands_at
+    return if flys_at.blank? || lands_at.blank?
+    errors.add(:flys_at, "can't be after lands_at") unless flys_at < lands_at
   end
 end
