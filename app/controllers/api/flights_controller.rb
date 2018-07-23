@@ -10,7 +10,7 @@ module Api
       if flight.save
         render json: flight, status: :created
       else
-        render json: flight.errors, status: :bad_request
+        render json: { errors: flight.errors }, status: :bad_request
       end
     end
 
@@ -27,7 +27,7 @@ module Api
         flight.save
         render json: flight
       else
-        render json: flight.errors, status: :bad_request
+        render json: { errors: flight.errors }, status: :bad_request
       end
     end
 
@@ -37,7 +37,7 @@ module Api
       if flight.destroy
         render json: flight, status: :no_content
       else
-        render json: flight.errors, status: :bad_request
+        render json: { errors: flight.errors }, status: :bad_request
       end
     end
 

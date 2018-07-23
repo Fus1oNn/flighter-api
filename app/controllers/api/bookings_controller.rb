@@ -10,7 +10,7 @@ module Api
       if booking.save
         render json: booking, status: :created
       else
-        render json: booking.errors, status: :bad_request
+        render json: { errors: booking.errors }, status: :bad_request
       end
     end
 
@@ -27,7 +27,7 @@ module Api
         booking.save
         render json: booking
       else
-        render json: booking.errors, status: :bad_request
+        render json: { errors: booking.errors }, status: :bad_request
       end
     end
 
@@ -37,7 +37,7 @@ module Api
       if booking.destroy
         render json: booking, status: :no_content
       else
-        render json: booking.errors, status: :bad_request
+        render json: { errors: booking.errors }, status: :bad_request
       end
     end
 

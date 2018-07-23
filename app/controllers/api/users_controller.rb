@@ -10,7 +10,7 @@ module Api
       if user.save
         render json: user, status: :created
       else
-        render json: user.errors, status: :bad_request
+        render json: { errors: user.errors }, status: :bad_request
       end
     end
 
@@ -27,7 +27,7 @@ module Api
         user.save
         render json: user
       else
-        render json: user.errors, status: :bad_request
+        render json: { errors: user.errors }, status: :bad_request
       end
     end
 
@@ -37,7 +37,7 @@ module Api
       if user.destroy
         render json: user, status: :no_content
       else
-        render json: user.errors, status: :bad_request
+        render json: { errors: user.errors }, status: :bad_request
       end
     end
 
