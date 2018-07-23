@@ -15,12 +15,9 @@ module Api
     end
 
     def show
-      company = Company.find_by(id: params[:id])
-      if company.nil?
-        render json: 'Company not found', status: :not_found
-      else
-        render json: company
-      end
+      company = Company.find(params[:id])
+
+      render json: company
     end
 
     def update
