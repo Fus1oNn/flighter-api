@@ -21,7 +21,7 @@ module Api
     end
 
     def update
-      user = user.find(params[:id])
+      user = User.find(params[:id])
 
       if user.update(user_params)
         user.save
@@ -32,7 +32,7 @@ module Api
     end
 
     def destroy
-      user = user.find(params[:id])
+      user = User.find(params[:id])
 
       if user.destroy
         render json: user, status: :no_content
