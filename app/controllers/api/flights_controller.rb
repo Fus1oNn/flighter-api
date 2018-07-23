@@ -10,7 +10,7 @@ module Api
       if flight.save
         render json: flight, status: :created
       else
-        render json: flight.errors, status: :unprocessable_entity
+        render json: flight.errors, status: :bad_request
       end
     end
 

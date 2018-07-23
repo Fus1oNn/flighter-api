@@ -10,7 +10,7 @@ module Api
       if booking.save
         render json: booking, status: :created
       else
-        render json: booking.errors, status: :unprocessable_entity
+        render json: booking.errors, status: :bad_request
       end
     end
 
