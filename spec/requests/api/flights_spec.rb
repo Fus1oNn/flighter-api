@@ -6,12 +6,18 @@ RSpec.describe 'Flights API', type: :request do
 
   describe 'GET /flights' do
     context 'when a request is sent' do
-      it 'returns a list of flights' do
-        flight
+      before { flight }
 
+      it 'returns a list of flights' do
         get '/api/flights'
 
         expect(json_body['flights'].length).to eq(1)
+      end
+
+      it 'returns 200 ok' do
+        get '/api/flights'
+
+        expect(response).to have_http_status(:ok)
       end
     end
   end
@@ -23,6 +29,12 @@ RSpec.describe 'Flights API', type: :request do
 
         expect(json_body['flight'])
           .to include('name' => flight.name)
+      end
+
+      it 'returns 200 ok' do
+        get "/api/flights/#{flight.id}"
+
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -36,14 +48,36 @@ RSpec.describe 'Flights API', type: :request do
 
   describe 'POST /flights' do
     context 'when params are valid' do
-      it 'creates a flight' do
+      before do
         post '/api/flights', params: { flight:
                                      { name: 'Dubai',
                                        flys_at: 2.days.from_now,
                                        lands_at: 3.days.from_now,
                                        no_of_seats: 100, base_price: 10,
                                        company_id: company.id } }
+      end
+
+      it 'creates a flight' do
         expect(json_body['flight']).to include('name' => 'Dubai')
+      end
+
+      it 'returns 201 created' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'really creates flight in DB' do
+        count_before = Flight.all.count
+
+        post '/api/flights', params: { flight:
+                                     { name: 'Hawaii',
+                                       flys_at: 2.days.from_now,
+                                       lands_at: 3.days.from_now,
+                                       no_of_seats: 100, base_price: 10,
+                                       company_id: company.id } }
+
+        count_after = Flight.all.count
+
+        expect(count_after).to eq(count_before + 1)
       end
     end
 
@@ -64,10 +98,22 @@ RSpec.describe 'Flights API', type: :request do
 
   describe 'PUT /flights/:id' do
     context 'when params are okay' do
-      it 'updates flight' do
+      before do
         put "/api/flights/#{flight.id}", params: { flight: { name: 'Dubai' } }
+      end
 
+      it 'updates flight' do
         expect(json_body['flight']).to include('name' => 'Dubai')
+      end
+
+      it 'returns 200 ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'really updated flight in DB' do
+        flight_after = Flight.find(flight.id)
+
+        expect(flight_after.name).to eq('Dubai')
       end
     end
 
@@ -86,6 +132,18 @@ RSpec.describe 'Flights API', type: :request do
         delete "/api/flights/#{flight.id}"
 
         expect(response).to have_http_status(:no_content)
+      end
+
+      it 'really deletes flight from DB' do
+        flight
+
+        count_before = Flight.all.count
+
+        delete "/api/flights/#{flight.id}"
+
+        count_after = Flight.all.count
+
+        expect(count_after).to eq(count_before - 1)
       end
     end
 

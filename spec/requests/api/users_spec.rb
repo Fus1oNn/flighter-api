@@ -5,12 +5,18 @@ RSpec.describe 'Users API', type: :request do
 
   describe 'GET /users' do
     context 'when a request is sent' do
-      it 'returns a list of users' do
-        user
+      before { user }
 
+      it 'returns a list of users' do
         get '/api/users'
 
         expect(json_body['users'].length).to eq(1)
+      end
+
+      it 'returns 200 ok' do
+        get '/api/users'
+
+        expect(response).to have_http_status(:ok)
       end
     end
   end
@@ -22,6 +28,12 @@ RSpec.describe 'Users API', type: :request do
 
         expect(json_body['user'])
           .to include('first_name' => user.first_name)
+      end
+
+      it 'returns 200 ok' do
+        get "/api/users/#{user.id}"
+
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -35,24 +47,40 @@ RSpec.describe 'Users API', type: :request do
 
   describe 'POST /users' do
     context 'when params are valid' do
-      it 'creates a user' do
+      before do
         post '/api/users',
              params: { user: { email: 'nesto@gmail.com', first_name: 'Mirko' } }
+      end
+
+      it 'creates a user' do
         expect(json_body['user'])
           .to include('email' => 'nesto@gmail.com')
+      end
+
+      it 'returns 201 created' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'really creates user in DB' do
+        count_before = User.all.count
+
+        post '/api/users',
+             params: { user: { email: 'nikaj@gmail.com', first_name: 'Mirko' } }
+
+        count_after = User.all.count
+
+        expect(count_after).to eq(count_before + 1)
       end
     end
 
     context 'when params are invalid' do
-      it 'returns 400 bad request' do
-        post '/api/users', params: { user: { first_name: '' } }
+      before { post '/api/users', params: { user: { first_name: '' } } }
 
+      it 'returns 400 bad request' do
         expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns errors' do
-        post '/api/users', params: { user: { first_name: '' } }
-
         expect(json_body['errors']).to include('first_name')
       end
     end
@@ -60,11 +88,23 @@ RSpec.describe 'Users API', type: :request do
 
   describe 'PUT /users/:id' do
     context 'when params are okay' do
-      it 'updates user' do
+      before do
         put "/api/users/#{user.id}", params: { user:
                                                { first_name: 'Empires' } }
+      end
 
+      it 'updates user' do
         expect(json_body['user']).to include('first_name' => 'Empires')
+      end
+
+      it 'returns 200 ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'really updated user in DB' do
+        user_after = User.find(user.id)
+
+        expect(user_after.first_name).to eq('Empires')
       end
     end
 
@@ -83,6 +123,18 @@ RSpec.describe 'Users API', type: :request do
         delete "/api/users/#{user.id}"
 
         expect(response).to have_http_status(:no_content)
+      end
+
+      it 'really deletes user from DB' do
+        user
+
+        count_before = User.all.count
+
+        delete "/api/users/#{user.id}"
+
+        count_after = User.all.count
+
+        expect(count_after).to eq(count_before - 1)
       end
     end
 
