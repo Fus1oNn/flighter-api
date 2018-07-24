@@ -24,7 +24,6 @@ module Api
       flight = Flight.find(params[:id])
 
       if flight.update(flight_params)
-        flight.save
         render json: flight
       else
         render json: { errors: flight.errors }, status: :bad_request

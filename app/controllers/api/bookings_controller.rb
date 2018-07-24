@@ -24,7 +24,6 @@ module Api
       booking = Booking.find(params[:id])
 
       if booking.update(booking_params)
-        booking.save
         render json: booking
       else
         render json: { errors: booking.errors }, status: :bad_request

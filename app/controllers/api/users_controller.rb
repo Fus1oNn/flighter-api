@@ -24,7 +24,6 @@ module Api
       user = User.find(params[:id])
 
       if user.update(user_params)
-        user.save
         render json: user
       else
         render json: { errors: user.errors }, status: :bad_request

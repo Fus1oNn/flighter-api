@@ -24,7 +24,6 @@ module Api
       company = Company.find(params[:id])
 
       if company.update(company_params)
-        company.save
         render json: company
       else
         render json: { errors: company.errors }, status: :bad_request
