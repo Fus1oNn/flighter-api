@@ -1,5 +1,8 @@
 module Api
   class UsersController < ApplicationController
+    before_action :authenticated, only: [:index, :show, :update, :destroy]
+    before_action :authorized, only: [:update, :show, :destroy]
+
     def index
       render json: User.all
     end
@@ -35,8 +38,27 @@ module Api
 
     private
 
+    def authenticated
+      token = request.headers['Authorization']
+      user = User.find_by(token: token)
+
+      if token && user
+      else
+        render json: { errors: { token: ['is invalid'] } },
+               status: :unauthorized
+      end
+    end
+
+    def authorized
+      if user.id == params[:id]
+      else
+        render json: { errors: { resource: ['forbidden'] } },
+               status: :forbidden
+      end
+    end
+
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :email)
+      params.require(:user).permit(:first_name, :last_name, :email, :password)
     end
   end
 end
