@@ -1,4 +1,6 @@
 RSpec.describe 'Bookings API', type: :request do
+  let(:token) { User.find(booking.user_id).token }
+
   include TestHelpers::JsonResponse
 
   describe 'GET /bookings' do

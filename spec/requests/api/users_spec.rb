@@ -1,4 +1,6 @@
 RSpec.describe 'Users API', type: :request do
+  let(:token) { User.find(booking.user_id).token }
+
   include TestHelpers::JsonResponse
 
   describe 'GET /users' do
@@ -50,7 +52,8 @@ RSpec.describe 'Users API', type: :request do
   describe 'POST /users' do
     context 'when params are valid' do
       let(:user_params) do
-        { user: { email: 'nesto@gmail.com', first_name: 'Mirko' } }
+        { user: { email: 'nesto@gmail.com',
+                  first_name: 'Mirko', password: 'password' } }
       end
 
       it 'creates a user' do
