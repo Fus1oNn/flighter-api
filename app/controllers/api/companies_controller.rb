@@ -15,9 +15,7 @@ module Api
     end
 
     def show
-      company = Company.find(params[:id])
-
-      render json: company
+      render json: Company.find(params[:id])
     end
 
     def update
@@ -31,13 +29,8 @@ module Api
     end
 
     def destroy
-      company = Company.find(params[:id])
-
-      if company.destroy
-        render json: company, status: :no_content
-      else
-        render json: { errors: company.errors }, status: :bad_request
-      end
+      Company.find(params[:id]).destroy!
+      head :no_content
     end
 
     private

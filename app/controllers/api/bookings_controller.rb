@@ -15,9 +15,7 @@ module Api
     end
 
     def show
-      booking = Booking.find(params[:id])
-
-      render json: booking
+      render json: Booking.find(params[:id])
     end
 
     def update
@@ -31,13 +29,8 @@ module Api
     end
 
     def destroy
-      booking = Booking.find(params[:id])
-
-      if booking.destroy
-        render json: booking, status: :no_content
-      else
-        render json: { errors: booking.errors }, status: :bad_request
-      end
+      Booking.find(params[:id]).destroy!
+      head :no_content
     end
 
     private

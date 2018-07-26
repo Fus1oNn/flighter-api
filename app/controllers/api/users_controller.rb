@@ -15,9 +15,7 @@ module Api
     end
 
     def show
-      user = User.find(params[:id])
-
-      render json: user
+      render json: User.find(params[:id])
     end
 
     def update
@@ -31,13 +29,8 @@ module Api
     end
 
     def destroy
-      user = User.find(params[:id])
-
-      if user.destroy
-        render json: user, status: :no_content
-      else
-        render json: { errors: user.errors }, status: :bad_request
-      end
+      User.find(params[:id]).destroy!
+      head :no_content
     end
 
     private

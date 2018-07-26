@@ -15,9 +15,7 @@ module Api
     end
 
     def show
-      flight = Flight.find(params[:id])
-
-      render json: flight
+      render json: Flight.find(params[:id])
     end
 
     def update
@@ -31,13 +29,8 @@ module Api
     end
 
     def destroy
-      flight = Flight.find(params[:id])
-
-      if flight.destroy
-        render json: flight, status: :no_content
-      else
-        render json: { errors: flight.errors }, status: :bad_request
-      end
+      Flight.find(params[:id]).destroy!
+      head :no_content
     end
 
     private
