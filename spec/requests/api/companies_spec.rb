@@ -47,7 +47,7 @@ RSpec.describe 'Companies API', type: :request do
     end
   end
 
-  describe 'POST /companies' do
+  describe 'POST /api/companies' do
     context 'when params are valid' do
       let(:company_params) { { company: { name: 'Croatia Airlines' } } }
 
@@ -85,7 +85,7 @@ RSpec.describe 'Companies API', type: :request do
     end
   end
 
-  describe 'PUT /companies/:id' do
+  describe 'PUT /api/companies/:id' do
     let(:company) { FactoryBot.create(:company) }
 
     context 'when params are okay' do
@@ -111,9 +111,7 @@ RSpec.describe 'Companies API', type: :request do
       it 'really updated company in DB' do
         put "/api/companies/#{company.id}", params: company_params
 
-        company_after = Company.find(company.id)
-
-        expect(company_after.name).to eq('Germanwings')
+        expect(company.reload.name).to eq('Germanwings')
       end
     end
 
@@ -126,7 +124,7 @@ RSpec.describe 'Companies API', type: :request do
     end
   end
 
-  describe 'DELETE /companies/:id' do
+  describe 'DELETE /api/companies/:id' do
     context 'when company exists' do
       let(:company) { FactoryBot.create(:company) }
 

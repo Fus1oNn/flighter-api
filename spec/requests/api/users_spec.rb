@@ -1,7 +1,7 @@
 RSpec.describe 'Users API', type: :request do
   include TestHelpers::JsonResponse
 
-  describe 'GET /users' do
+  describe 'GET /api/users' do
     let(:user) { FactoryBot.create(:user) }
 
     context 'when a request is sent' do
@@ -21,7 +21,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'GET /users/:id' do
+  describe 'GET /api/users/:id' do
     context 'when users exists' do
       let(:user) { FactoryBot.create(:user) }
 
@@ -47,7 +47,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'POST /users' do
+  describe 'POST /api/users' do
     context 'when params are valid' do
       let(:user_params) do
         { user: { email: 'nesto@gmail.com', first_name: 'Mirko' } }
@@ -87,7 +87,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'PUT /users/:id' do
+  describe 'PUT /api/users/:id' do
     let(:user) { FactoryBot.create(:user) }
 
     context 'when params are okay' do
@@ -108,9 +108,7 @@ RSpec.describe 'Users API', type: :request do
       it 'really updated user in DB' do
         put "/api/users/#{user.id}", params: user_params
 
-        user_after = User.find(user.id)
-
-        expect(user_after.first_name).to eq('Empires')
+        expect(user.reload.first_name).to eq('Empires')
       end
     end
 
@@ -123,7 +121,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'DELETE /users/:id' do
+  describe 'DELETE /api/users/:id' do
     context 'when user exists' do
       let(:user) { FactoryBot.create(:user) }
 

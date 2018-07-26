@@ -1,7 +1,7 @@
 RSpec.describe 'Bookings API', type: :request do
   include TestHelpers::JsonResponse
 
-  describe 'GET /bookings' do
+  describe 'GET /api/bookings' do
     let(:booking) { FactoryBot.create(:booking) }
 
     context 'when a request is sent' do
@@ -21,7 +21,7 @@ RSpec.describe 'Bookings API', type: :request do
     end
   end
 
-  describe 'GET /bookings/:id' do
+  describe 'GET /api/bookings/:id' do
     context 'when booking exists' do
       let(:booking) { FactoryBot.create(:booking) }
 
@@ -47,7 +47,7 @@ RSpec.describe 'Bookings API', type: :request do
     end
   end
 
-  describe 'POST /bookings' do
+  describe 'POST /api/bookings' do
     context 'when params are valid' do
       let(:user) { FactoryBot.create(:user) }
       let(:flight) { FactoryBot.create(:flight) }
@@ -92,7 +92,7 @@ RSpec.describe 'Bookings API', type: :request do
     end
   end
 
-  describe 'PUT /bookings/:id' do
+  describe 'PUT /api/bookings/:id' do
     let(:booking) { FactoryBot.create(:booking) }
 
     context 'when params are okay' do
@@ -118,9 +118,7 @@ RSpec.describe 'Bookings API', type: :request do
       it 'really updated booking in DB' do
         put "/api/bookings/#{booking.id}", params: booking_params
 
-        booking_after = Booking.find(booking.id)
-
-        expect(booking_after.seat_price).to eq(3)
+        expect(booking.reload.seat_price).to eq(3)
       end
     end
 
@@ -134,7 +132,7 @@ RSpec.describe 'Bookings API', type: :request do
     end
   end
 
-  describe 'DELETE /bookings/:id' do
+  describe 'DELETE /api/bookings/:id' do
     context 'when booking exists' do
       let(:booking) { FactoryBot.create(:booking) }
 

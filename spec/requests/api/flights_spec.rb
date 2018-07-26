@@ -1,7 +1,7 @@
 RSpec.describe 'Flights API', type: :request do
   include TestHelpers::JsonResponse
 
-  describe 'GET /flights' do
+  describe 'GET /api/flights' do
     let(:flight) { FactoryBot.create(:flight) }
 
     context 'when a request is sent' do
@@ -21,7 +21,7 @@ RSpec.describe 'Flights API', type: :request do
     end
   end
 
-  describe 'GET /flights/:id' do
+  describe 'GET /api/flights/:id' do
     context 'when flight exists' do
       let(:flight) { FactoryBot.create(:flight) }
 
@@ -47,7 +47,7 @@ RSpec.describe 'Flights API', type: :request do
     end
   end
 
-  describe 'POST /flights' do
+  describe 'POST /api/flights' do
     context 'when params are valid' do
       let(:company) { FactoryBot.create(:company) }
       let(:flight_params) do
@@ -92,7 +92,7 @@ RSpec.describe 'Flights API', type: :request do
     end
   end
 
-  describe 'PUT /flights/:id' do
+  describe 'PUT /api/flights/:id' do
     let(:flight) { FactoryBot.create(:flight) }
 
     context 'when params are okay' do
@@ -113,9 +113,7 @@ RSpec.describe 'Flights API', type: :request do
       it 'really updated flight in DB' do
         put "/api/flights/#{flight.id}", params: flight_params
 
-        flight_after = Flight.find(flight.id)
-
-        expect(flight_after.name).to eq('Dubai')
+        expect(flight.reload.name).to eq('Dubai')
       end
     end
 
@@ -128,7 +126,7 @@ RSpec.describe 'Flights API', type: :request do
     end
   end
 
-  describe 'DELETE /flights/:id' do
+  describe 'DELETE /api/flights/:id' do
     context 'when flight exists' do
       let(:flight) { FactoryBot.create(:flight) }
 
