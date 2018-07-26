@@ -1,10 +1,9 @@
 RSpec.describe 'Bookings API', type: :request do
   include TestHelpers::JsonResponse
-  let(:user) { FactoryBot.create(:user) }
-  let(:flight) { FactoryBot.create(:flight) }
-  let(:booking) { FactoryBot.create(:booking) }
 
   describe 'GET /bookings' do
+    let(:booking) { FactoryBot.create(:booking) }
+
     context 'when a request is sent' do
       before { booking }
 
@@ -24,6 +23,8 @@ RSpec.describe 'Bookings API', type: :request do
 
   describe 'GET /bookings/:id' do
     context 'when booking exists' do
+      let(:booking) { FactoryBot.create(:booking) }
+
       it 'returns the booking in json' do
         get "/api/bookings/#{booking.id}"
 
@@ -48,64 +49,75 @@ RSpec.describe 'Bookings API', type: :request do
 
   describe 'POST /bookings' do
     context 'when params are valid' do
-      before do
-        post '/api/bookings',
-             params: { booking: { seat_price: 3, no_of_seats: 5,
-                                  user_id: user.id,
-                                  flight_id: flight.id } }
+      let(:user) { FactoryBot.create(:user) }
+      let(:flight) { FactoryBot.create(:flight) }
+      let(:booking_params) do
+        { booking: { seat_price: 3,
+                     no_of_seats: 5,
+                     user_id: user.id,
+                     flight_id: flight.id } }
       end
 
       it 'creates a booking' do
-        expect(json_body['booking'])
-          .to include('seat_price' => 3)
+        post '/api/bookings', params: booking_params
+
+        expect(json_body['booking']).to include('seat_price' => 3)
       end
 
       it 'returns 201 created' do
+        post '/api/bookings', params: booking_params
+
         expect(response).to have_http_status(:created)
       end
 
       it 'really creates booking in DB' do
-        count_before = Booking.all.count
-
-        post '/api/bookings',
-             params: { booking: { seat_price: 3, no_of_seats: 5,
-                                  user_id: user.id,
-                                  flight_id: flight.id } }
-        count_after = Booking.all.count
-
-        expect(count_after).to eq(count_before + 1)
+        expect do
+          post '/api/bookings', params: booking_params
+        end.to change(Booking, :count).by(1)
       end
     end
 
     context 'when params are invalid' do
-      before { post '/api/bookings', params: { booking: { seat_price: 3 } } }
-
       it 'returns 400 bad request' do
+        post '/api/bookings', params: { booking: { seat_price: 3 } }
+
         expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns errors' do
+        post '/api/bookings', params: { booking: { seat_price: 3 } }
+
         expect(json_body['errors']).to include('no_of_seats')
       end
     end
   end
 
   describe 'PUT /bookings/:id' do
+    let(:booking) { FactoryBot.create(:booking) }
+
     context 'when params are okay' do
+      let(:booking_params) { { booking: { seat_price: 3 } } }
+
       before do
         put "/api/bookings/#{booking.id}", params: { booking:
                                                    { seat_price: 3 } }
       end
 
       it 'updates booking' do
+        put "/api/bookings/#{booking.id}", params: booking_params
+
         expect(json_body['booking']).to include('seat_price' => 3)
       end
 
       it 'returns 200 ok' do
+        put "/api/bookings/#{booking.id}", params: booking_params
+
         expect(response).to have_http_status(:ok)
       end
 
       it 'really updated booking in DB' do
+        put "/api/bookings/#{booking.id}", params: booking_params
+
         booking_after = Booking.find(booking.id)
 
         expect(booking_after.seat_price).to eq(3)
@@ -124,6 +136,8 @@ RSpec.describe 'Bookings API', type: :request do
 
   describe 'DELETE /bookings/:id' do
     context 'when booking exists' do
+      let(:booking) { FactoryBot.create(:booking) }
+
       it 'returns 204 no content' do
         delete "/api/bookings/#{booking.id}"
 
@@ -133,13 +147,9 @@ RSpec.describe 'Bookings API', type: :request do
       it 'really deletes booking from DB' do
         booking
 
-        count_before = Booking.all.count
-
-        delete "/api/bookings/#{booking.id}"
-
-        count_after = Booking.all.count
-
-        expect(count_after).to eq(count_before - 1)
+        expect do
+          delete "/api/bookings/#{booking.id}"
+        end.to change(Booking, :count).by(-1)
       end
     end
 

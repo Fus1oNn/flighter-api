@@ -1,9 +1,9 @@
 RSpec.describe 'Companies API', type: :request do
   include TestHelpers::JsonResponse
 
-  let(:company) { FactoryBot.create(:company) }
-
   describe 'GET /companies' do
+    let(:company) { FactoryBot.create(:company) }
+
     context 'when a request is sent' do
       before { company }
 
@@ -23,6 +23,8 @@ RSpec.describe 'Companies API', type: :request do
 
   describe 'GET /companies/:id' do
     context 'when company exists' do
+      let(:company) { FactoryBot.create(:company) }
+
       it 'returns the company in json' do
         get "/api/companies/#{company.id}"
 
@@ -47,28 +49,24 @@ RSpec.describe 'Companies API', type: :request do
 
   describe 'POST /companies' do
     context 'when params are valid' do
-      before do
-        post '/api/companies',
-             params: { company: { name: 'Croatia Airlines' } }
-      end
+      let(:company_params) { { company: { name: 'Croatia Airlines' } } }
 
       it 'creates a company' do
+        post '/api/companies', params: company_params
+
         expect(json_body['company']).to include('name' => 'Croatia Airlines')
       end
 
       it 'returns 201 created' do
+        post '/api/companies', params: company_params
+
         expect(response).to have_http_status(:created)
       end
 
       it 'really creates company in DB' do
-        count_before = Company.all.count
-
-        post '/api/companies',
-             params: { company: { name: 'Emirates' } }
-
-        count_after = Company.all.count
-
-        expect(count_after).to eq(count_before + 1)
+        expect do
+          post '/api/companies', params: company_params
+        end.to change(Company, :count).by(1)
       end
     end
 
@@ -88,21 +86,31 @@ RSpec.describe 'Companies API', type: :request do
   end
 
   describe 'PUT /companies/:id' do
+    let(:company) { FactoryBot.create(:company) }
+
     context 'when params are okay' do
+      let(:company_params) { { company: { name: 'Germanwings' } } }
+
       before do
         put "/api/companies/#{company.id}", params: { company:
                                                       { name: 'Germanwings' } }
       end
 
       it 'updates company' do
+        put "/api/companies/#{company.id}", params: company_params
+
         expect(json_body['company']).to include('name' => 'Germanwings')
       end
 
       it 'returns 200 ok' do
+        put "/api/companies/#{company.id}", params: company_params
+
         expect(response).to have_http_status(:ok)
       end
 
       it 'really updated company in DB' do
+        put "/api/companies/#{company.id}", params: company_params
+
         company_after = Company.find(company.id)
 
         expect(company_after.name).to eq('Germanwings')
@@ -120,6 +128,8 @@ RSpec.describe 'Companies API', type: :request do
 
   describe 'DELETE /companies/:id' do
     context 'when company exists' do
+      let(:company) { FactoryBot.create(:company) }
+
       it 'returns 204 no content' do
         delete "/api/companies/#{company.id}"
 
@@ -129,13 +139,9 @@ RSpec.describe 'Companies API', type: :request do
       it 'really deletes company from DB' do
         company
 
-        count_before = Company.all.count
-
-        delete "/api/companies/#{company.id}"
-
-        count_after = Company.all.count
-
-        expect(count_after).to eq(count_before - 1)
+        expect do
+          delete "/api/companies/#{company.id}"
+        end.to change(Company, :count).by(-1)
       end
     end
 

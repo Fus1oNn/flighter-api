@@ -1,10 +1,9 @@
 RSpec.describe 'Flights API', type: :request do
   include TestHelpers::JsonResponse
 
-  let(:flight) { FactoryBot.create(:flight) }
-  let(:company) { FactoryBot.create(:company) }
-
   describe 'GET /flights' do
+    let(:flight) { FactoryBot.create(:flight) }
+
     context 'when a request is sent' do
       before { flight }
 
@@ -24,6 +23,8 @@ RSpec.describe 'Flights API', type: :request do
 
   describe 'GET /flights/:id' do
     context 'when flight exists' do
+      let(:flight) { FactoryBot.create(:flight) }
+
       it 'returns the flight in json' do
         get "/api/flights/#{flight.id}"
 
@@ -48,36 +49,31 @@ RSpec.describe 'Flights API', type: :request do
 
   describe 'POST /flights' do
     context 'when params are valid' do
-      before do
-        post '/api/flights', params: { flight:
-                                     { name: 'Dubai',
-                                       flys_at: 2.days.from_now,
-                                       lands_at: 3.days.from_now,
-                                       no_of_seats: 100, base_price: 10,
-                                       company_id: company.id } }
+      let(:company) { FactoryBot.create(:company) }
+      let(:flight_params) do
+        { flight: { name: 'Dubai',
+                    flys_at: 2.days.from_now,
+                    lands_at: 3.days.from_now,
+                    no_of_seats: 100, base_price: 10,
+                    company_id: company.id } }
       end
 
       it 'creates a flight' do
+        post '/api/flights', params: flight_params
+
         expect(json_body['flight']).to include('name' => 'Dubai')
       end
 
       it 'returns 201 created' do
+        post '/api/flights', params: flight_params
+
         expect(response).to have_http_status(:created)
       end
 
       it 'really creates flight in DB' do
-        count_before = Flight.all.count
-
-        post '/api/flights', params: { flight:
-                                     { name: 'Hawaii',
-                                       flys_at: 2.days.from_now,
-                                       lands_at: 3.days.from_now,
-                                       no_of_seats: 100, base_price: 10,
-                                       company_id: company.id } }
-
-        count_after = Flight.all.count
-
-        expect(count_after).to eq(count_before + 1)
+        expect do
+          post '/api/flights', params: flight_params
+        end.to change(Flight, :count).by(1)
       end
     end
 
@@ -97,20 +93,26 @@ RSpec.describe 'Flights API', type: :request do
   end
 
   describe 'PUT /flights/:id' do
+    let(:flight) { FactoryBot.create(:flight) }
+
     context 'when params are okay' do
-      before do
-        put "/api/flights/#{flight.id}", params: { flight: { name: 'Dubai' } }
-      end
+      let(:flight_params) { { flight: { name: 'Dubai' } } }
 
       it 'updates flight' do
+        put "/api/flights/#{flight.id}", params: flight_params
+
         expect(json_body['flight']).to include('name' => 'Dubai')
       end
 
       it 'returns 200 ok' do
+        put "/api/flights/#{flight.id}", params: flight_params
+
         expect(response).to have_http_status(:ok)
       end
 
       it 'really updated flight in DB' do
+        put "/api/flights/#{flight.id}", params: flight_params
+
         flight_after = Flight.find(flight.id)
 
         expect(flight_after.name).to eq('Dubai')
@@ -128,6 +130,8 @@ RSpec.describe 'Flights API', type: :request do
 
   describe 'DELETE /flights/:id' do
     context 'when flight exists' do
+      let(:flight) { FactoryBot.create(:flight) }
+
       it 'returns 204 no content' do
         delete "/api/flights/#{flight.id}"
 
@@ -137,13 +141,9 @@ RSpec.describe 'Flights API', type: :request do
       it 'really deletes flight from DB' do
         flight
 
-        count_before = Flight.all.count
-
-        delete "/api/flights/#{flight.id}"
-
-        count_after = Flight.all.count
-
-        expect(count_after).to eq(count_before - 1)
+        expect do
+          delete "/api/flights/#{flight.id}"
+        end.to change(Flight, :count).by(-1)
       end
     end
 
