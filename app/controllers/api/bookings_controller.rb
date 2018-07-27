@@ -10,9 +10,8 @@ module Api
     end
 
     def create
-      booking = Booking.new(booking_params)
-
-      return unless authorize_user(booking, request.headers['Authorization'])
+      user = User.find_by(token: request.headers['Authorization'])
+      booking = Booking.new(booking_params.merge(user_id: user.id))
 
       save_and_render_booking(booking)
     end
@@ -86,8 +85,7 @@ module Api
     end
 
     def booking_params
-      params.require(:booking).permit(:no_of_seats, :seat_price,
-                                      :user_id, :flight_id)
+      params.require(:booking).permit(:no_of_seats, :seat_price, :flight_id)
     end
   end
 end
