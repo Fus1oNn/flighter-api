@@ -1,5 +1,6 @@
 RSpec.describe 'Flights API', type: :request do
-  let(:token) { User.find(booking.user_id).token }
+  let(:user) { FactoryBot.create(:user) }
+  let(:auth) { { Authorization: user.token } }
 
   include TestHelpers::JsonResponse
 
@@ -10,13 +11,13 @@ RSpec.describe 'Flights API', type: :request do
       before { flight }
 
       it 'returns a list of flights' do
-        get '/api/flights'
+        get '/api/flights', headers: auth
 
         expect(json_body['flights'].length).to eq(1)
       end
 
       it 'returns 200 ok' do
-        get '/api/flights'
+        get '/api/flights', headers: auth
 
         expect(response).to have_http_status(:ok)
       end
@@ -28,14 +29,14 @@ RSpec.describe 'Flights API', type: :request do
       let(:flight) { FactoryBot.create(:flight) }
 
       it 'returns the flight in json' do
-        get "/api/flights/#{flight.id}"
+        get "/api/flights/#{flight.id}", headers: auth
 
         expect(json_body['flight'])
           .to include('name' => flight.name)
       end
 
       it 'returns 200 ok' do
-        get "/api/flights/#{flight.id}"
+        get "/api/flights/#{flight.id}", headers: auth
 
         expect(response).to have_http_status(:ok)
       end
@@ -43,7 +44,7 @@ RSpec.describe 'Flights API', type: :request do
 
     context "when flight doesn't exist" do
       it 'returns 404 not found' do
-        get '/api/flights/1'
+        get '/api/flights/1', headers: auth
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -61,33 +62,33 @@ RSpec.describe 'Flights API', type: :request do
       end
 
       it 'creates a flight' do
-        post '/api/flights', params: flight_params
+        post '/api/flights', params: flight_params, headers: auth
 
         expect(json_body['flight']).to include('name' => 'Dubai')
       end
 
       it 'returns 201 created' do
-        post '/api/flights', params: flight_params
+        post '/api/flights', params: flight_params, headers: auth
 
         expect(response).to have_http_status(:created)
       end
 
       it 'really creates flight in DB' do
         expect do
-          post '/api/flights', params: flight_params
+          post '/api/flights', params: flight_params, headers: auth
         end.to change(Flight, :count).by(1)
       end
     end
 
     context 'when params are invalid' do
       it 'returns 400 bad request' do
-        post '/api/flights', params: { flight: { name: '' } }
+        post '/api/flights', params: { flight: { name: '' } }, headers: auth
 
         expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns errors' do
-        post '/api/flights', params: { flight: { name: '' } }
+        post '/api/flights', params: { flight: { name: '' } }, headers: auth
 
         expect(json_body['errors']).to include('name')
       end
@@ -101,19 +102,19 @@ RSpec.describe 'Flights API', type: :request do
       let(:flight_params) { { flight: { name: 'Dubai' } } }
 
       it 'updates flight' do
-        put "/api/flights/#{flight.id}", params: flight_params
+        put "/api/flights/#{flight.id}", params: flight_params, headers: auth
 
         expect(json_body['flight']).to include('name' => 'Dubai')
       end
 
       it 'returns 200 ok' do
-        put "/api/flights/#{flight.id}", params: flight_params
+        put "/api/flights/#{flight.id}", params: flight_params, headers: auth
 
         expect(response).to have_http_status(:ok)
       end
 
       it 'really updated flight in DB' do
-        put "/api/flights/#{flight.id}", params: flight_params
+        put "/api/flights/#{flight.id}", params: flight_params, headers: auth
 
         flight_after = Flight.find(flight.id)
 
@@ -123,7 +124,8 @@ RSpec.describe 'Flights API', type: :request do
 
     context 'when params not okay' do
       it 'returns 400 bad request' do
-        put "/api/flights/#{flight.id}", params: { flight: { name: '' } }
+        put "/api/flights/#{flight.id}", params: { flight: { name: '' } },
+                                         headers: auth
 
         expect(response).to have_http_status(:bad_request)
       end
@@ -135,7 +137,7 @@ RSpec.describe 'Flights API', type: :request do
       let(:flight) { FactoryBot.create(:flight) }
 
       it 'returns 204 no content' do
-        delete "/api/flights/#{flight.id}"
+        delete "/api/flights/#{flight.id}", headers: auth
 
         expect(response).to have_http_status(:no_content)
       end
@@ -144,14 +146,14 @@ RSpec.describe 'Flights API', type: :request do
         flight
 
         expect do
-          delete "/api/flights/#{flight.id}"
+          delete "/api/flights/#{flight.id}", headers: auth
         end.to change(Flight, :count).by(-1)
       end
     end
 
     context 'when flight does not exist' do
       it 'returns 404 not found' do
-        delete '/api/flights/1'
+        delete '/api/flights/1', headers: auth
 
         expect(response).to have_http_status(:not_found)
       end

@@ -1,5 +1,6 @@
 RSpec.describe 'Users API', type: :request do
-  let(:token) { User.find(booking.user_id).token }
+  # let(:user) { FactoryBot.create(:user) }
+  # let(:auth) { { Authorization: user.token } }
 
   include TestHelpers::JsonResponse
 
@@ -9,14 +10,16 @@ RSpec.describe 'Users API', type: :request do
     context 'when a request is sent' do
       before { user }
 
+      let(:auth) { { Authorization: user.token } }
+
       it 'returns a list of users' do
-        get '/api/users'
+        get '/api/users', headers: auth
 
         expect(json_body['users'].length).to eq(1)
       end
 
       it 'returns 200 ok' do
-        get '/api/users'
+        get '/api/users', headers: auth
 
         expect(response).to have_http_status(:ok)
       end
@@ -26,16 +29,17 @@ RSpec.describe 'Users API', type: :request do
   describe 'GET /users/:id' do
     context 'when users exists' do
       let(:user) { FactoryBot.create(:user) }
+      let(:auth) { { Authorization: user.token } }
 
       it 'returns the user in json' do
-        get "/api/users/#{user.id}"
+        get "/api/users/#{user.id}", headers: auth
 
         expect(json_body['user'])
           .to include('first_name' => user.first_name)
       end
 
       it 'returns 200 ok' do
-        get "/api/users/#{user.id}"
+        get "/api/users/#{user.id}", headers: auth
 
         expect(response).to have_http_status(:ok)
       end
@@ -43,7 +47,7 @@ RSpec.describe 'Users API', type: :request do
 
     context "when user doesn't exist" do
       it 'returns 404 not found' do
-        get '/api/users/1'
+        get '/api/users/1', headers: { Authorization: 'abc123' }
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -92,24 +96,25 @@ RSpec.describe 'Users API', type: :request do
 
   describe 'PUT /users/:id' do
     let(:user) { FactoryBot.create(:user) }
+    let(:auth) { { Authorization: user.token } }
 
     context 'when params are okay' do
       let(:user_params) { { user: { first_name: 'Empires' } } }
 
       it 'updates user' do
-        put "/api/users/#{user.id}", params: user_params
+        put "/api/users/#{user.id}", params: user_params, headers: auth
 
         expect(json_body['user']).to include('first_name' => 'Empires')
       end
 
       it 'returns 200 ok' do
-        put "/api/users/#{user.id}", params: user_params
+        put "/api/users/#{user.id}", params: user_params, headers: auth
 
         expect(response).to have_http_status(:ok)
       end
 
       it 'really updated user in DB' do
-        put "/api/users/#{user.id}", params: user_params
+        put "/api/users/#{user.id}", params: user_params, headers: auth
 
         user_after = User.find(user.id)
 
@@ -119,7 +124,8 @@ RSpec.describe 'Users API', type: :request do
 
     context 'when params not okay' do
       it 'returns 400 bad request' do
-        put "/api/users/#{user.id}", params: { user: { first_name: '' } }
+        put "/api/users/#{user.id}", params: { user: { first_name: '' } },
+                                     headers: auth
 
         expect(response).to have_http_status(:bad_request)
       end
@@ -129,9 +135,10 @@ RSpec.describe 'Users API', type: :request do
   describe 'DELETE /users/:id' do
     context 'when user exists' do
       let(:user) { FactoryBot.create(:user) }
+      let(:auth) { { Authorization: user.token } }
 
       it 'returns 204 no content' do
-        delete "/api/users/#{user.id}"
+        delete "/api/users/#{user.id}", headers: auth
 
         expect(response).to have_http_status(:no_content)
       end
@@ -140,14 +147,14 @@ RSpec.describe 'Users API', type: :request do
         user
 
         expect do
-          delete "/api/users/#{user.id}"
+          delete "/api/users/#{user.id}", headers: auth
         end.to change(User, :count).by(-1)
       end
     end
 
     context 'when user does not exist' do
       it 'returns 404 not found' do
-        delete '/api/users/1'
+        delete '/api/users/1', headers: { Authorization: 'abc123' }
 
         expect(response).to have_http_status(:not_found)
       end
