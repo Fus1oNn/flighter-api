@@ -5,22 +5,19 @@ module Api
     before_action :authorized, only: [:update, :show, :destroy]
 
     def index
-      render json: Booking.find_by!(token: token)
+      render json: Booking.all
     end
 
     def create
       booking = Booking.new(booking_params)
+      user = User.find_by!(token: request.headers['Authorization'])
 
       unless booking.user_id == user.id
         render json: { errors: { token: ['is invalid'] } },
                status: :unauthorized && return
       end
 
-      if booking.save
-        render json: booking, status: :created
-      else
-        render json: { errors: booking.errors }, status: :bad_request
-      end
+      save_and_render_booking(booking)
     end
 
     def show
@@ -44,9 +41,11 @@ module Api
 
     private
 
+    attr_accessor :token, :user
+
     def authenticated
       token = request.headers['Authorization']
-      user = User.find_by(token: token)
+      user = User.find_by!(token: token)
 
       if token && user
       else
@@ -56,10 +55,21 @@ module Api
     end
 
     def authorized
-      if user.id == params[:id]
+      token = request.headers['Authorization']
+      user = User.find_by!(token: token)
+      booking = Booking.find(params[:id])
+      if user.id == booking.user_id
       else
-        render json: { errors: { resource: ['forbidden'] } },
+        render json: { errors: { resource: ['is forbidden'] } },
                status: :forbidden
+      end
+    end
+
+    def save_and_render_booking(booking)
+      if booking.save
+        render json: booking, status: :created
+      else
+        render json: { errors: booking.errors }, status: :bad_request
       end
     end
 

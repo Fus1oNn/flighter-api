@@ -38,9 +38,11 @@ module Api
 
     private
 
+    attr_accessor :token, :user
+
     def authenticated
       token = request.headers['Authorization']
-      user = User.find_by(token: token)
+      user = User.find_by!(token: token)
 
       if token && user
       else
@@ -50,9 +52,10 @@ module Api
     end
 
     def authorized
-      if user.id == params[:id]
+      authenticated_user = User.find_by(token: request.headers['Authorization'])
+      if authenticated_user.id == params[:id].to_i
       else
-        render json: { errors: { resource: ['forbidden'] } },
+        render json: { errors: { resource: ['is forbidden'] } },
                status: :forbidden
       end
     end
