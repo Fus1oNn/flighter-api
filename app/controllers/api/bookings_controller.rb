@@ -1,7 +1,7 @@
 module Api
   class BookingsController < ApplicationController
     before_action :authenticated,
-                  only: [:index, :show, :update, :destroy]
+                  only: [:index, :create, :show, :update, :destroy]
     before_action :authorized, only: [:update, :show, :destroy]
 
     def index
@@ -50,6 +50,7 @@ module Api
       user = User.find_by(token: token)
 
       if token && user
+        user
       else
         render json: { errors: { token: ['is invalid'] } },
                status: :unauthorized
