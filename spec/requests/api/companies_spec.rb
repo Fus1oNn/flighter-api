@@ -91,11 +91,6 @@ RSpec.describe 'Companies API', type: :request do
     context 'when params are okay' do
       let(:company_params) { { company: { name: 'Germanwings' } } }
 
-      before do
-        put "/api/companies/#{company.id}", params: { company:
-                                                      { name: 'Germanwings' } }
-      end
-
       it 'updates company' do
         put "/api/companies/#{company.id}", params: company_params
 
