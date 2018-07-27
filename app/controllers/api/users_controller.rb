@@ -42,7 +42,7 @@ module Api
 
     def authenticated
       token = request.headers['Authorization']
-      user = User.find_by!(token: token)
+      user = User.find_by(token: token)
 
       if token && user
       else

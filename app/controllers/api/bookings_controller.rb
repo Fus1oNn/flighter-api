@@ -10,7 +10,7 @@ module Api
 
     def create
       booking = Booking.new(booking_params)
-      user = User.find_by!(token: request.headers['Authorization'])
+      user = User.find_by(token: request.headers['Authorization'])
 
       unless booking.user_id == user.id
         render json: { errors: { token: ['is invalid'] } },
@@ -45,7 +45,7 @@ module Api
 
     def authenticated
       token = request.headers['Authorization']
-      user = User.find_by!(token: token)
+      user = User.find_by(token: token)
 
       if token && user
       else
@@ -56,7 +56,7 @@ module Api
 
     def authorized
       token = request.headers['Authorization']
-      user = User.find_by!(token: token)
+      user = User.find_by(token: token)
       booking = Booking.find(params[:id])
       if user.id == booking.user_id
       else
