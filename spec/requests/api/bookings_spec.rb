@@ -44,8 +44,11 @@ RSpec.describe 'Bookings API', type: :request do
     end
 
     context "when booking doesn't exist" do
+      let(:user) { FactoryBot.create(:user) }
+      let(:auth) { { Authorization: user.token } }
+
       it 'returns 404 not found' do
-        get '/api/bookings/1', headers: { Authorization: 'abc123' }
+        get '/api/bookings/1', headers: auth
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -172,8 +175,11 @@ RSpec.describe 'Bookings API', type: :request do
     end
 
     context 'when booking does not exist' do
+      let(:user) { FactoryBot.create(:user) }
+      let(:auth) { { Authorization: user.token } }
+
       it 'returns 404 not found' do
-        delete '/api/bookings/1', headers: { Authorization: 'abc123' }
+        delete '/api/bookings/1', headers: auth
 
         expect(response).to have_http_status(:not_found)
       end

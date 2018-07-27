@@ -27,10 +27,10 @@ RSpec.describe 'Users API', type: :request do
   end
 
   describe 'GET /users/:id' do
-    context 'when users exists' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:auth) { { Authorization: user.token } }
+    let(:user) { FactoryBot.create(:user) }
+    let(:auth) { { Authorization: user.token } }
 
+    context 'when users exists' do
       it 'returns the user in json' do
         get "/api/users/#{user.id}", headers: auth
 
@@ -45,10 +45,10 @@ RSpec.describe 'Users API', type: :request do
       end
     end
 
-    context "when user doesn't exist" do
-      it 'returns 404 not found' do
-        get '/api/users/1', headers: { Authorization: 'abc123' }
-        expect(response).to have_http_status(:not_found)
+    context "when it's some other user" do
+      it 'returns 403 forbidden' do
+        get '/api/users/1', headers: auth
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
@@ -133,10 +133,10 @@ RSpec.describe 'Users API', type: :request do
   end
 
   describe 'DELETE /users/:id' do
-    context 'when user exists' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:auth) { { Authorization: user.token } }
+    let(:user) { FactoryBot.create(:user) }
+    let(:auth) { { Authorization: user.token } }
 
+    context 'when user exists' do
       it 'returns 204 no content' do
         delete "/api/users/#{user.id}", headers: auth
 
@@ -152,11 +152,11 @@ RSpec.describe 'Users API', type: :request do
       end
     end
 
-    context 'when user does not exist' do
-      it 'returns 404 not found' do
-        delete '/api/users/1', headers: { Authorization: 'abc123' }
+    context 'when destroying some other user' do
+      it 'returns 403 forbidden' do
+        delete '/api/users/1', headers: auth
 
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
