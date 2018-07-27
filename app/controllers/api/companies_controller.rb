@@ -1,6 +1,7 @@
 module Api
   class CompaniesController < ApplicationController
-    before_action :authenticated, only: [:index, :show, :update, :destroy]
+    before_action :authenticated, only: [:index, :create, :show,
+                                         :update, :destroy]
 
     def index
       render json: Company.all

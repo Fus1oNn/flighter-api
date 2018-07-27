@@ -10,18 +10,18 @@ module Api
 
     def create
       booking = Booking.new(booking_params)
-      user = User.find_by(token: request.headers['Authorization'])
 
-      unless booking.user_id == user.id
-        render json: { errors: { token: ['is invalid'] } },
-               status: :unauthorized && return
-      end
+      return unless authorize_user(booking, request.headers['Authorization'])
 
       save_and_render_booking(booking)
     end
 
     def show
-      render json: Booking.find(params[:id])
+      booking = Booking.find(params[:id])
+
+      return unless authorize_user(booking, request.headers['Authorization'])
+
+      render json: booking
     end
 
     def update
@@ -63,6 +63,15 @@ module Api
         render json: { errors: { resource: ['is forbidden'] } },
                status: :forbidden
       end
+    end
+
+    def authorize_user(booking, token)
+      user = User.find_by(token: token)
+
+      return true if booking.user_id == user.id
+      render json: { errors: { token: ['is invalid'] } },
+             status: :unauthorized
+      false
     end
 
     def save_and_render_booking(booking)
