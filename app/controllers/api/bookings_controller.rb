@@ -1,11 +1,12 @@
 module Api
   class BookingsController < ApplicationController
     before_action :authenticated,
-                  only: [:index, :create, :show, :update, :destroy]
+                  only: [:index, :show, :update, :destroy]
     before_action :authorized, only: [:update, :show, :destroy]
 
     def index
-      render json: Booking.all
+      user = User.find_by(token: request.headers['Authorization'])
+      render json: Booking.where('user_id = ?', user.id)
     end
 
     def create
@@ -26,6 +27,8 @@ module Api
 
     def update
       booking = Booking.find(params[:id])
+
+      return unless authorize_user(booking, request.headers['Authorization'])
 
       if booking.update(booking_params)
         render json: booking
