@@ -1,7 +1,6 @@
 module Api
   class CompaniesController < ApplicationController
-    before_action :authenticated, only: [:index, :create, :show,
-                                         :update, :destroy]
+    before_action :authenticated
 
     def index
       render json: Company.all
@@ -37,17 +36,6 @@ module Api
     end
 
     private
-
-    def authenticated
-      token = request.headers['Authorization']
-      user = User.find_by(token: token)
-
-      if token && user
-      else
-        render json: { errors: { token: ['is invalid'] } },
-               status: :unauthorized
-      end
-    end
 
     def company_params
       params.require(:company).permit(:name)

@@ -13,4 +13,14 @@ class ApplicationController < ActionController::Base
     render json: { errors: { resource: ['does not exist'] } },
            status: :not_found
   end
+
+  def authenticated
+    token = request.headers['Authorization']
+    user = User.find_by(token: token)
+
+    return if token && user
+
+    render json: { errors: { token: ['is invalid'] } },
+           status: :unauthorized
+  end
 end
