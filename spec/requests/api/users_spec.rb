@@ -54,6 +54,9 @@ RSpec.describe 'Users API', type: :request do
   end
 
   describe 'POST /users' do
+    let(:user) { FactoryBot.create(:user) }
+    let(:auth) { { Authorization: user.token } }
+
     context 'when params are valid' do
       let(:user_params) do
         { user: { email: 'nesto@gmail.com',
@@ -61,33 +64,36 @@ RSpec.describe 'Users API', type: :request do
       end
 
       it 'creates a user' do
-        post '/api/users', params: user_params
+        post '/api/users', params: user_params, headers: auth
 
         expect(json_body['user']).to include('email' => 'nesto@gmail.com')
       end
 
       it 'returns 201 created' do
-        post '/api/users', params: user_params
+        post '/api/users', params: user_params, headers: auth
 
         expect(response).to have_http_status(:created)
       end
 
       it 'really creates user in DB' do
+        user
         expect do
-          post '/api/users', params: user_params
+          post '/api/users', params: user_params, headers: auth
         end.to change(User, :count).by(1)
       end
     end
 
     context 'when params are invalid' do
       it 'returns 400 bad request' do
-        post '/api/users', params: { user: { first_name: '' } }
+        post '/api/users', params: { user: { first_name: '' } },
+                           headers: auth
 
         expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns errors' do
-        post '/api/users', params: { user: { first_name: '' } }
+        post '/api/users', params: { user: { first_name: '' } },
+                           headers: auth
 
         expect(json_body['errors']).to include('first_name')
       end
