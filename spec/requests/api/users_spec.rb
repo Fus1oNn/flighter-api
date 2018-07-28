@@ -163,9 +163,7 @@ RSpec.describe 'Users API', type: :request do
       it 'really updated user in DB' do
         put "/api/users/#{user.id}", params: user_params, headers: auth
 
-        user_after = User.find(user.id)
-
-        expect(user_after.first_name).to eq('Empires')
+        expect(user.reload.first_name).to eq('Empires')
       end
     end
 

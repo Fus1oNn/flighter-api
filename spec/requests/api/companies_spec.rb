@@ -168,9 +168,7 @@ RSpec.describe 'Companies API', type: :request do
         put "/api/companies/#{company.id}", params: company_params,
                                             headers: auth
 
-        company_after = Company.find(company.id)
-
-        expect(company_after.name).to eq('Germanwings')
+        expect(company.reload.name).to eq('Germanwings')
       end
     end
 

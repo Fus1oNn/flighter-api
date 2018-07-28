@@ -161,9 +161,7 @@ RSpec.describe 'Flights API', type: :request do
       it 'really updated flight in DB' do
         put "/api/flights/#{flight.id}", params: flight_params, headers: auth
 
-        flight_after = Flight.find(flight.id)
-
-        expect(flight_after.name).to eq('Dubai')
+        expect(flight.reload.name).to eq('Dubai')
       end
     end
 

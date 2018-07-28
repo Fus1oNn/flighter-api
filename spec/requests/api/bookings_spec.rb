@@ -184,9 +184,7 @@ RSpec.describe 'Bookings API', type: :request do
       it 'really updated booking in DB' do
         put "/api/bookings/#{booking.id}", params: booking_params, headers: auth
 
-        booking_after = Booking.find(booking.id)
-
-        expect(booking_after.seat_price).to eq(3)
+        expect(booking.reload.seat_price).to eq(3)
       end
     end
 
