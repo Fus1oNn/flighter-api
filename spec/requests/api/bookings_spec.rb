@@ -1,12 +1,12 @@
 RSpec.describe 'Bookings API', type: :request do
   include TestHelpers::JsonResponse
 
-  describe 'GET /bookings' do
+  describe 'GET /api/bookings' do
     let(:booking) { FactoryBot.create(:booking) }
     let(:user) { User.find(booking.user_id) }
     let(:auth) { { Authorization: user.token } }
 
-    context 'when a request is sent' do
+    context 'when authenticated and a request is sent' do
       before { booking }
 
       it 'returns a list of bookings' do
@@ -21,11 +21,26 @@ RSpec.describe 'Bookings API', type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error response' do
+        get '/api/bookings'
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        get '/api/bookings'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'GET /bookings/:id' do
-    context 'when booking exists' do
-      let(:booking) { FactoryBot.create(:booking) }
+  describe 'GET /api/bookings/:id' do
+    let(:booking) { FactoryBot.create(:booking) }
+
+    context 'when authenticated and booking exists' do
       let(:user) { User.find(booking.user_id) }
       let(:auth) { { Authorization: user.token } }
 
@@ -43,7 +58,7 @@ RSpec.describe 'Bookings API', type: :request do
       end
     end
 
-    context "when booking doesn't exist" do
+    context "when authenticated and booking doesn't exist" do
       let(:user) { FactoryBot.create(:user) }
       let(:auth) { { Authorization: user.token } }
 
@@ -52,10 +67,35 @@ RSpec.describe 'Bookings API', type: :request do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error response' do
+        get "/api/bookings/#{booking.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        get "/api/bookings/#{booking.id}"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'when not authorized' do
+      let(:other) { FactoryBot.create(:user) }
+
+      it 'returns status 403 forbidden' do
+        get "/api/bookings/#{booking.id}",
+            headers: { Authorization: other.token }
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
-  describe 'POST /bookings' do
-    context 'when params are valid' do
+  describe 'POST /api/bookings' do
+    context 'when authenticated and params are valid' do
       let(:user) { FactoryBot.create(:user) }
       let(:auth) { { Authorization: user.token } }
       let(:flight) { FactoryBot.create(:flight) }
@@ -85,7 +125,7 @@ RSpec.describe 'Bookings API', type: :request do
       end
     end
 
-    context 'when params are invalid' do
+    context 'when authenticated and params are invalid' do
       let(:user) { FactoryBot.create(:user) }
       let(:auth) { { Authorization: user.token } }
 
@@ -105,21 +145,29 @@ RSpec.describe 'Bookings API', type: :request do
         expect(json_body['errors']).to include('no_of_seats')
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error response' do
+        post '/api/bookings'
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        post '/api/bookings'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'PUT /bookings/:id' do
+  describe 'PUT /api/bookings/:id' do
     let(:booking) { FactoryBot.create(:booking) }
     let(:user) { User.find(booking.user_id) }
     let(:auth) { { Authorization: user.token } }
 
-    context 'when params are okay' do
+    context 'when authenticated and params are okay' do
       let(:booking_params) { { booking: { seat_price: 3 } } }
-
-      before do
-        put "/api/bookings/#{booking.id}", params: { booking:
-                                                   { seat_price: 3 } },
-                                           headers: auth
-      end
 
       it 'updates booking' do
         put "/api/bookings/#{booking.id}", params: booking_params, headers: auth
@@ -142,7 +190,7 @@ RSpec.describe 'Bookings API', type: :request do
       end
     end
 
-    context 'when params not okay' do
+    context 'when authenticated and params not okay' do
       it 'returns 400 bad request' do
         put "/api/bookings/#{booking.id}", params: { booking:
                                                    { seat_price: 0 } },
@@ -151,11 +199,37 @@ RSpec.describe 'Bookings API', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error response' do
+        put "/api/bookings/#{booking.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        put "/api/bookings/#{booking.id}"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'when not authorized' do
+      let(:other) { FactoryBot.create(:user) }
+
+      it 'returns status 403 forbidden' do
+        put "/api/bookings/#{booking.id}",
+            headers: { Authorization: other.token }
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
-  describe 'DELETE /bookings/:id' do
-    context 'when booking exists' do
-      let(:booking) { FactoryBot.create(:booking) }
+  describe 'DELETE /api/bookings/:id' do
+    let(:booking) { FactoryBot.create(:booking) }
+
+    context 'when authenticated and booking exists' do
       let(:user) { User.find(booking.user_id) }
       let(:auth) { { Authorization: user.token } }
 
@@ -174,7 +248,7 @@ RSpec.describe 'Bookings API', type: :request do
       end
     end
 
-    context 'when booking does not exist' do
+    context 'when authenticated and booking does not exist' do
       let(:user) { FactoryBot.create(:user) }
       let(:auth) { { Authorization: user.token } }
 
@@ -182,6 +256,31 @@ RSpec.describe 'Bookings API', type: :request do
         delete '/api/bookings/1', headers: auth
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when not authenicated' do
+      it 'returns an error response' do
+        delete "/api/bookings/#{booking.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        delete "/api/bookings/#{booking.id}"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'when not authorized' do
+      let(:other) { FactoryBot.create(:user) }
+
+      it 'returns status 403 forbidden' do
+        delete "/api/bookings/#{booking.id}",
+               headers: { Authorization: other.token }
+
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

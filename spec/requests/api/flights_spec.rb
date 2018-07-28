@@ -4,10 +4,10 @@ RSpec.describe 'Flights API', type: :request do
 
   include TestHelpers::JsonResponse
 
-  describe 'GET /flights' do
+  describe 'GET /api/flights' do
     let(:flight) { FactoryBot.create(:flight) }
 
-    context 'when a request is sent' do
+    context 'when authenticated and  a request is sent' do
       before { flight }
 
       it 'returns a list of flights' do
@@ -22,10 +22,24 @@ RSpec.describe 'Flights API', type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error message' do
+        get '/api/flights'
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        get '/api/flights'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'GET /flights/:id' do
-    context 'when flight exists' do
+  describe 'GET /api/flights/:id' do
+    context 'when authenticated and flight exists' do
       let(:flight) { FactoryBot.create(:flight) }
 
       it 'returns the flight in json' do
@@ -42,16 +56,33 @@ RSpec.describe 'Flights API', type: :request do
       end
     end
 
-    context "when flight doesn't exist" do
+    context "when authenticated and flight doesn't exist" do
       it 'returns 404 not found' do
         get '/api/flights/1', headers: auth
+
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when not authenticated' do
+      let(:flight) { FactoryBot.create(:flight) }
+
+      it 'returns an error message' do
+        get "/api/flights/#{flight.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        get "/api/flights/#{flight.id}"
+
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
 
-  describe 'POST /flights' do
-    context 'when params are valid' do
+  describe 'POST /api/flights' do
+    context 'when authenticated and params are valid' do
       let(:company) { FactoryBot.create(:company) }
       let(:flight_params) do
         { flight: { name: 'Dubai',
@@ -80,7 +111,7 @@ RSpec.describe 'Flights API', type: :request do
       end
     end
 
-    context 'when params are invalid' do
+    context 'when authenticated and params are invalid' do
       it 'returns 400 bad request' do
         post '/api/flights', params: { flight: { name: '' } }, headers: auth
 
@@ -93,12 +124,26 @@ RSpec.describe 'Flights API', type: :request do
         expect(json_body['errors']).to include('name')
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error message' do
+        post '/api/flights'
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        post '/api/flights'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'PUT /flights/:id' do
+  describe 'PUT /api/flights/:id' do
     let(:flight) { FactoryBot.create(:flight) }
 
-    context 'when params are okay' do
+    context 'when authenticated and params are okay' do
       let(:flight_params) { { flight: { name: 'Dubai' } } }
 
       it 'updates flight' do
@@ -122,7 +167,7 @@ RSpec.describe 'Flights API', type: :request do
       end
     end
 
-    context 'when params not okay' do
+    context 'when authenticated and  params not okay' do
       it 'returns 400 bad request' do
         put "/api/flights/#{flight.id}", params: { flight: { name: '' } },
                                          headers: auth
@@ -130,10 +175,24 @@ RSpec.describe 'Flights API', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error message' do
+        put "/api/flights/#{flight.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        put "/api/flights/#{flight.id}"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'DELETE /flights/:id' do
-    context 'when flight exists' do
+  describe 'DELETE /api/flights/:id' do
+    context 'when authenticated and flight exists' do
       let(:flight) { FactoryBot.create(:flight) }
 
       it 'returns 204 no content' do
@@ -151,11 +210,27 @@ RSpec.describe 'Flights API', type: :request do
       end
     end
 
-    context 'when flight does not exist' do
+    context 'when authenticated and flight does not exist' do
       it 'returns 404 not found' do
         delete '/api/flights/1', headers: auth
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when not authenticated' do
+      let(:flight) { FactoryBot.create(:flight) }
+
+      it 'returns an error message' do
+        delete "/api/flights/#{flight.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        delete "/api/flights/#{flight.id}"
+
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

@@ -4,10 +4,10 @@ RSpec.describe 'Companies API', type: :request do
 
   include TestHelpers::JsonResponse
 
-  describe 'GET /companies' do
+  describe 'GET /api/companies' do
     let(:company) { FactoryBot.create(:company) }
 
-    context 'when a request is sent' do
+    context 'when authenticated and a request is sent' do
       before { company }
 
       it 'returns a list of companies' do
@@ -22,10 +22,24 @@ RSpec.describe 'Companies API', type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns error response' do
+        get '/api/companies'
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        get '/api/companies'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'GET /companies/:id' do
-    context 'when company exists' do
+  describe 'GET /api/companies/:id' do
+    context 'when authenticated and company exists' do
       let(:company) { FactoryBot.create(:company) }
 
       it 'returns the company in json' do
@@ -42,16 +56,33 @@ RSpec.describe 'Companies API', type: :request do
       end
     end
 
-    context "when company doesn't exist" do
+    context "when authenticated and company doesn't exist" do
       it 'returns 404 not found' do
         get '/api/companies/1', headers: auth
+
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when not authenticated' do
+      let(:company) { FactoryBot.create(:company) }
+
+      it 'returns an error message' do
+        get "/api/companies/#{company.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        get "/api/companies/#{company.id}"
+
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
 
-  describe 'POST /companies' do
-    context 'when params are valid' do
+  describe 'POST /api/companies' do
+    context 'when authenticated and params are valid' do
       let(:company_params) { { company: { name: 'Croatia Airlines' } } }
 
       it 'creates a company' do
@@ -76,7 +107,7 @@ RSpec.describe 'Companies API', type: :request do
       end
     end
 
-    context 'when params are invalid' do
+    context 'when authenticated and params are invalid' do
       it 'returns 400 bad request' do
         post '/api/companies', params: { company: { name: '' } },
                                headers: auth
@@ -91,12 +122,26 @@ RSpec.describe 'Companies API', type: :request do
         expect(json_body['errors']).to include('name')
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error message' do
+        post '/api/companies'
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        post '/api/companies'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'PUT /companies/:id' do
+  describe 'PUT /api/companies/:id' do
     let(:company) { FactoryBot.create(:company) }
 
-    context 'when params are okay' do
+    context 'when authenticated and params are okay' do
       let(:company_params) { { company: { name: 'Germanwings' } } }
 
       before do
@@ -129,7 +174,7 @@ RSpec.describe 'Companies API', type: :request do
       end
     end
 
-    context 'when params not okay' do
+    context 'when authenticated and params not okay' do
       it 'returns 400 bad request' do
         put "/api/companies/#{company.id}", params: { company: { name: '' } },
                                             headers: auth
@@ -137,10 +182,24 @@ RSpec.describe 'Companies API', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when not authenticated' do
+      it 'returns an error message' do
+        put "/api/companies/#{company.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unathorized' do
+        put "/api/companies/#{company.id}"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
-  describe 'DELETE /companies/:id' do
-    context 'when company exists' do
+  describe 'DELETE /api/companies/:id' do
+    context 'when authenticated and company exists' do
       let(:company) { FactoryBot.create(:company) }
 
       it 'returns 204 no content' do
@@ -158,11 +217,27 @@ RSpec.describe 'Companies API', type: :request do
       end
     end
 
-    context 'when company does not exist' do
+    context 'when authenticated and company does not exist' do
       it 'returns 404 not found' do
         delete '/api/companies/1', headers: auth
 
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when not authenticated' do
+      let(:company) { FactoryBot.create(:company) }
+
+      it 'returns an error message' do
+        delete "/api/companies/#{company.id}"
+
+        expect(json_body['errors']).to include('token')
+      end
+
+      it 'returns status 401 unauthorized' do
+        delete "/api/companies/#{company.id}"
+
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
