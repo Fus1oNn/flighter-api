@@ -84,20 +84,20 @@ RSpec.describe 'Users API', type: :request do
     let(:user) { FactoryBot.create(:user) }
     let(:auth) { { Authorization: user.token } }
 
-    context 'when authenticated and params are valid' do
+    context 'when params are valid' do
       let(:user_params) do
         { user: { email: 'nesto@gmail.com',
                   first_name: 'Mirko', password: 'password' } }
       end
 
       it 'creates a user' do
-        post '/api/users', params: user_params, headers: auth
+        post '/api/users', params: user_params
 
         expect(json_body['user']).to include('email' => 'nesto@gmail.com')
       end
 
       it 'returns 201 created' do
-        post '/api/users', params: user_params, headers: auth
+        post '/api/users', params: user_params
 
         expect(response).to have_http_status(:created)
       end
@@ -105,38 +105,22 @@ RSpec.describe 'Users API', type: :request do
       it 'really creates user in DB' do
         user
         expect do
-          post '/api/users', params: user_params, headers: auth
+          post '/api/users', params: user_params
         end.to change(User, :count).by(1)
       end
     end
 
-    context 'when authenticated and params are invalid' do
+    context 'when params are invalid' do
       it 'returns 400 bad request' do
-        post '/api/users', params: { user: { first_name: '' } },
-                           headers: auth
+        post '/api/users', params: { user: { first_name: '' } }
 
         expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns errors' do
-        post '/api/users', params: { user: { first_name: '' } },
-                           headers: auth
+        post '/api/users', params: { user: { first_name: '' } }
 
         expect(json_body['errors']).to include('first_name')
-      end
-    end
-
-    context 'when not authenticated' do
-      it 'returns an error response' do
-        post '/api/users'
-
-        expect(json_body['errors']).to include('token')
-      end
-
-      it 'returns status 401 unauthorized' do
-        post '/api/users'
-
-        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
