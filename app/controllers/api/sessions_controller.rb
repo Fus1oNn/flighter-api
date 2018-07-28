@@ -15,6 +15,9 @@ module Api
     end
 
     def destroy
+      token = request.headers['Authorization']
+      user = User.find_by(token: token)
+
       user.regenerate_token
       head :no_content
     end
