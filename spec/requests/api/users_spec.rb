@@ -1,7 +1,7 @@
 RSpec.describe 'Users API', type: :request do
   include TestHelpers::JsonResponse
 
-  describe 'GET /users' do
+  describe 'GET /api/users' do
     let(:user) { FactoryBot.create(:user) }
 
     context 'when authenticated' do
@@ -39,7 +39,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'GET /users/:id' do
+  describe 'GET /api/users/:id' do
     let(:user) { FactoryBot.create(:user) }
     let(:auth) { { Authorization: user.token } }
 
@@ -80,7 +80,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'POST /users' do
+  describe 'POST /api/users' do
     let(:user) { FactoryBot.create(:user) }
     let(:auth) { { Authorization: user.token } }
 
@@ -141,7 +141,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'PUT /users/:id' do
+  describe 'PUT /api/users/:id' do
     let(:user) { FactoryBot.create(:user) }
     let(:other) { FactoryBot.create(:user) }
     let(:auth) { { Authorization: user.token } }
@@ -201,7 +201,7 @@ RSpec.describe 'Users API', type: :request do
     end
   end
 
-  describe 'DELETE /users/:id' do
+  describe 'DELETE /api/users/:id' do
     let(:user) { FactoryBot.create(:user) }
     let(:auth) { { Authorization: user.token } }
 
