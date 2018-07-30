@@ -2,8 +2,8 @@ RSpec.describe 'Bookings API', type: :request do
   include TestHelpers::JsonResponse
 
   describe 'GET /api/bookings' do
-    let(:booking) { FactoryBot.create(:booking) }
-    let(:user) { User.find(booking.user_id) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:booking) { FactoryBot.create(:booking, user: user) }
     let(:auth) { { Authorization: user.token } }
 
     context 'when authenticated and a request is sent' do
@@ -38,10 +38,10 @@ RSpec.describe 'Bookings API', type: :request do
   end
 
   describe 'GET /api/bookings/:id' do
-    let(:booking) { FactoryBot.create(:booking) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:booking) { FactoryBot.create(:booking, user: user) }
 
     context 'when authenticated and booking exists' do
-      let(:user) { User.find(booking.user_id) }
       let(:auth) { { Authorization: user.token } }
 
       it 'returns the booking in json' do
@@ -162,8 +162,8 @@ RSpec.describe 'Bookings API', type: :request do
   end
 
   describe 'PUT /api/bookings/:id' do
-    let(:booking) { FactoryBot.create(:booking) }
-    let(:user) { User.find(booking.user_id) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:booking) { FactoryBot.create(:booking, user: user) }
     let(:auth) { { Authorization: user.token } }
 
     context 'when authenticated and params are okay' do
@@ -225,10 +225,10 @@ RSpec.describe 'Bookings API', type: :request do
   end
 
   describe 'DELETE /api/bookings/:id' do
-    let(:booking) { FactoryBot.create(:booking) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:booking) { FactoryBot.create(:booking, user: user) }
 
     context 'when authenticated and booking exists' do
-      let(:user) { User.find(booking.user_id) }
       let(:auth) { { Authorization: user.token } }
 
       it 'returns 204 no content' do

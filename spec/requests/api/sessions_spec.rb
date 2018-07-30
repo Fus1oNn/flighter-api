@@ -40,4 +40,38 @@ RSpec.describe 'Sessions API', type: :request do
       end
     end
   end
+
+  describe 'DELETE /api/session' do
+    context 'when authenticated' do
+      let(:user) { FactoryBot.create(:user) }
+      let(:auth) { { Authorization: user.token } }
+
+      it 'returns status 204 no content' do
+        delete '/api/session', headers: auth
+
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it 'regenerates new token for user' do
+        user
+        expect do
+          delete '/api/session', headers: auth
+        end.to(change { user.reload.token })
+      end
+    end
+
+    context 'when not authenticated' do
+      it 'returns status 401 unauthorized' do
+        delete '/api/session'
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'returns an error response' do
+        delete '/api/session'
+
+        expect(json_body['errors']).to include('token')
+      end
+    end
+  end
 end
