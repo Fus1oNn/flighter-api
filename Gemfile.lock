@@ -166,6 +166,9 @@ GEM
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    pry-byebug (3.6.0)
+      byebug (~> 10.0)
+      pry (~> 0.10)
     puma (3.11.4)
     rack (2.0.5)
     rack-test (1.0.0)
@@ -300,6 +303,7 @@ DEPENDENCIES
   overcommit
   pg (>= 0.18, < 2.0)
   pry
+  pry-byebug
   puma (~> 3.11)
   rails (~> 5.2.0)
   rspec-rails (~> 3.7)
