@@ -1,5 +1,7 @@
 module Api
   class FlightsController < ApplicationController
+    before_action :authenticated
+
     def index
       render json: Flight.all
     end

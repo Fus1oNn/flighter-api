@@ -1,5 +1,7 @@
 module Api
   class CompaniesController < ApplicationController
+    before_action :authenticated
+
     def index
       render json: Company.all
     end

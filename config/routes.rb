@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   ActiveAdmin.routes(self)
   namespace :api do
+    resource :session, only: [:create, :destroy]
     resources :users, except: [:new, :edit]
     resources :companies, except: [:new, :edit]
     resources :bookings, except: [:new, :edit]

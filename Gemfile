@@ -7,6 +7,8 @@ gem 'activeadmin'
 
 gem 'active_model_serializers'
 
+gem 'bcrypt', '~> 3.1.7'
+
 gem 'faraday'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.0'
@@ -43,6 +45,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'factory_bot_rails'
   gem 'pry'
+  gem 'pry-byebug'
   gem 'rspec-rails', '~> 3.7'
   gem 'shoulda-matchers'
 end
