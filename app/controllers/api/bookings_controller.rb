@@ -1,12 +1,11 @@
 module Api
   class BookingsController < ApplicationController
-    before_action :authenticated,
-                  only: [:index, :create, :show, :update, :destroy]
+    before_action :authenticated
     before_action :authorized, only: [:update, :show, :destroy]
 
     def index
       user = User.find_by(token: request.headers['Authorization'])
-      render json: Booking.where('user_id = ?', user.id)
+      render json: Booking.where(user: user)
     end
 
     def create
@@ -23,15 +22,11 @@ module Api
     def show
       booking = Booking.find(params[:id])
 
-      return unless authorize_user(booking, request.headers['Authorization'])
-
       render json: booking
     end
 
     def update
       booking = Booking.find(params[:id])
-
-      return unless authorize_user(booking, request.headers['Authorization'])
 
       if booking.update(booking_params)
         render json: booking
@@ -47,38 +42,13 @@ module Api
 
     private
 
-    attr_accessor :token, :user
-
-    def authenticated
-      token = request.headers['Authorization']
-      user = User.find_by(token: token)
-
-      if token && user
-        user
-      else
-        render json: { errors: { token: ['is invalid'] } },
-               status: :unauthorized
-      end
-    end
-
     def authorized
-      token = request.headers['Authorization']
-      user = User.find_by(token: token)
+      user = User.find_by(token: request.headers['Authorization'])
       booking = Booking.find(params[:id])
-      if user.id == booking.user_id
-      else
-        render json: { errors: { resource: ['is forbidden'] } },
-               status: :forbidden
-      end
-    end
 
-    def authorize_user(booking, token)
-      user = User.find_by(token: token)
-
-      return true if booking.user_id == user.id
-      render json: { errors: { token: ['is invalid'] } },
-             status: :unauthorized
-      false
+      return if user.id == booking.user_id
+      render json: { errors: { resource: ['is forbidden'] } },
+             status: :forbidden
     end
 
     def booking_params
